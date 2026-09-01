@@ -135,6 +135,7 @@
     <nav class="tabs" role="tablist">
       <button type="button" role="tab" data-tab="karta" aria-selected="true">Карта</button>
       <button type="button" role="tab" data-tab="dengi" aria-selected="false">Деньги</button>
+      <button type="button" role="tab" data-tab="bot" aria-selected="false">Бот</button>
       <button type="button" role="tab" data-tab="mashina" aria-selected="false">Машина</button>
       <button type="button" role="tab" data-tab="srok" aria-selected="false">Срок</button>
       <button type="button" role="tab" data-tab="gde" aria-selected="false">Где лежит</button>
@@ -201,6 +202,52 @@
           <tr><td>Минск 2,9 млн = цена в России</td><td>Часто нельзя поставить на учёт. Постановление № 152.</td></tr>
         </tbody>
       </table>
+    </section>
+
+    <section id="bot" class="panel" role="tabpanel">
+      <div class="callout warn">
+        <b>Один бот на срочном рынке машину почти не покупает</b>
+        Чтобы с 100 тысяч хватило на салон, бот должен ровно давать около <b>21,6% в месяц</b> два года подряд. Это рост счёта примерно в 10 раз за год. Так не торгуют. Расчёт: <a href="fuchersy-bot.md">fuchersy-bot.md</a>, код <code>scripts/futures_bot_withdraw.py</code>.
+      </div>
+      <h2>Как устроена схема</h2>
+      <p class="note">20% прибыли уходит в спокойный вклад (14% годовых, потом около 11%). 80% остаётся на бирже — от этого растёт объём торговли. Снятое не сгорает, если бота обнулят.</p>
+      <svg class="chart" id="botFlow" viewBox="0 0 900 200" role="img" aria-label="Бот, вывод прибыли и вклад"></svg>
+      <div class="stats">
+        <div class="stat"><strong>19,4%</strong><span>Нужно в месяц на вторичку 3,99 млн</span></div>
+        <div class="stat"><strong class="warn-num">21,6%</strong><span>Нужно в месяц на салон 5,72 млн</span></div>
+        <div class="stat"><strong>5%</strong><span>Сильный живой бот: через 2 года ~299 тыс.</span></div>
+        <div class="stat"><strong>20%</strong><span>Правило: доля прибыли во вклад, не доля счёта</span></div>
+      </div>
+      <h2>Куда кладём снятые 20%</h2>
+      <p>Спокойный рублёвый вклад и фонды почти как вклад. Прибыльнее матраса, спокойнее срочного рынка: нет залога, который биржа списывает за день. Биткоин и акции сюда не кладём — они сами прыгают.</p>
+      <h2>Сколько денег через 24 месяца, если прибыль ровная</h2>
+      <p class="note">Пунктир — вторичка и салон. Зелёная линия — бот, который как раз дотягивает до салона (21,6% в месяц). Серая — сильный, но правдоподобный 5% в месяц.</p>
+      <svg class="chart" id="botLine" viewBox="0 0 800 300"></svg>
+      <p class="legend"><i style="background:var(--used)"></i>Бот 21,6% в месяц, всего &nbsp; <i style="background:var(--accent)"></i>из них вклад &nbsp; <i style="background:var(--neutral)"></i>бот 5% в месяц, всего</p>
+      <table>
+        <thead>
+          <tr>
+            <th>Прибыль бота в месяц</th>
+            <th class="r">На бирже</th>
+            <th class="r">Во вкладе</th>
+            <th class="r">Всего</th>
+            <th>Вторичка</th>
+            <th>Салон</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td>2%</td><td class="r">146 тыс.</td><td class="r">13 тыс.</td><td class="r">159 тыс.</td><td>нет</td><td>нет</td></tr>
+          <tr><td>5%</td><td class="r">256 тыс.</td><td class="r">43 тыс.</td><td class="r">299 тыс.</td><td>нет</td><td>нет</td></tr>
+          <tr><td>10%</td><td class="r">634 тыс.</td><td class="r">144 тыс.</td><td class="r">778 тыс.</td><td>нет</td><td>нет</td></tr>
+          <tr><td>15%</td><td class="r">1,52 млн</td><td class="r">377 тыс.</td><td class="r">1,89 млн</td><td>нет</td><td>нет</td></tr>
+          <tr><td>18%</td><td class="r">2,52 млн</td><td class="r">640 тыс.</td><td class="r">3,17 млн</td><td>нет</td><td>нет</td></tr>
+          <tr><td>20%</td><td class="r">3,52 млн</td><td class="r">900 тыс.</td><td class="r">4,42 млн</td><td>да</td><td>нет</td></tr>
+          <tr><td>21,6%</td><td class="r">4,55 млн</td><td class="r">1,17 млн</td><td class="r">5,72 млн</td><td>да</td><td>да</td></tr>
+        </tbody>
+      </table>
+      <h2>Если счёт бота обнулили через 12 месяцев</h2>
+      <p>Во вкладе уже лежит снятое. При 5% в месяц до обнуления останется около 18 тысяч, при 10% — около 44 тысяч. Это подушка, не машина. Вывод 20% <b>не ускоряет</b> покупку: если оставлять всю прибыль на бирже, до салона хватило бы 18,4% в месяц вместо 21,6%. Вывод нужен, чтобы не потерять всё разом.</p>
+      <p class="note">Главный путь проекта по-прежнему план Б: работа плюс спокойный рынок. Бот — только кусок, потерю которого работа переживёт.</p>
     </section>
 
     <section id="mashina" class="panel" role="tabpanel">
@@ -271,6 +318,9 @@
         <thead><tr><th>Путь в репозитории</th><th>Что это</th></tr></thead>
         <tbody>
           <tr><td><code>docs/obzor.html</code></td><td>Эта карта с вкладками, открывается в браузере</td></tr>
+          <tr><td><code>docs/fuchersy-bot.md</code></td><td>Расчёт: бот на срочном рынке и вывод 20% прибыли</td></tr>
+          <tr><td><code>docs/futures_bot_results.json</code></td><td>Сырые цифры этого расчёта</td></tr>
+          <tr><td><code>scripts/futures_bot_withdraw.py</code></td><td>Код расчёта бота</td></tr>
           <tr><td><code>docs/analiz-xiaomi-su7-24m.md</code></td><td>Полный разбор, источник формулировок</td></tr>
           <tr><td><code>docs/vetka-pokupki.md</code></td><td>Как купить дешевле салона и ездить в России</td></tr>
           <tr><td><code>docs/plan-rabot.md</code></td><td>План дел по неделям</td></tr>
@@ -330,6 +380,9 @@
     ];
     const MES = ["старт", "3", "6", "9", "12", "15", "18", "21", "24 мес"];
     const PLAN_B = wealthEvery3Months(208000, 0.14);
+    const PATH_BOT_SALON = [0.1, 0.177, 0.301, 0.501, 0.824, 1.345, 2.185, 3.538, 5.72];
+    const PATH_BOT_STABLE = [0.0, 0.015, 0.041, 0.082, 0.15, 0.258, 0.432, 0.714, 1.168];
+    const PATH_BOT_5 = [0.1, 0.116, 0.133, 0.153, 0.176, 0.201, 0.23, 0.263, 0.299];
     const PLAN_V = wealthEvery3Months(113000, 0.12);
     const VKLAD = wealthEvery3Months(0, 0.125);
 
@@ -480,6 +533,57 @@
       });
     }
 
+    function drawBotFlow() {
+      const svg = document.getElementById("botFlow");
+      if (!svg) return;
+      svg.replaceChildren();
+      box(svg, 16, 78, 150, 44, "Старт 100 тыс.");
+      box(svg, 210, 78, 170, 44, "Бот на срочном рынке");
+      box(svg, 460, 20, 190, 44, "80% прибыли → объём");
+      box(svg, 460, 136, 190, 44, "20% прибыли → вклад", true);
+      box(svg, 700, 20, 180, 44, "Счёт на бирже растёт");
+      box(svg, 700, 136, 180, 44, "Вклад не сгорает с ботом", true);
+      line(svg, 166, 100, 210, 100);
+      line(svg, 380, 100, 460, 42);
+      line(svg, 380, 100, 460, 158);
+      line(svg, 650, 42, 700, 42);
+      line(svg, 650, 158, 700, 158);
+    }
+
+    function drawBotLine() {
+      const svg = document.getElementById("botLine");
+      if (!svg) return;
+      svg.replaceChildren();
+      const W = 800, H = 300, pad = { l: 48, r: 90, t: 20, b: 36 };
+      const iw = W - pad.l - pad.r, ih = H - pad.t - pad.b;
+      const yMax = 7;
+      const xs = MES.map((_, i) => pad.l + (i / (MES.length - 1)) * iw);
+      const y = (v) => pad.t + ih - (v / yMax) * ih;
+      function poly(data, color, fill, width) {
+        const pts = data.map((v, i) => `${xs[i]},${y(v)}`).join(" ");
+        if (fill) {
+          const area = `${xs[0]},${y(0)} ${pts} ${xs[xs.length - 1]},${y(0)}`;
+          svg.appendChild(el("polygon", { points: area, fill: color, opacity: "0.12" }));
+        }
+        svg.appendChild(el("polyline", { points: pts, fill: "none", stroke: color, "stroke-width": width || "2.2" }));
+      }
+      [[3.99, css("--used"), "вторичка"], [5.72, css("--warn"), "салон"]].forEach(([v, c, lab]) => {
+        svg.appendChild(el("line", {
+          x1: pad.l, y1: y(v), x2: W - pad.r, y2: y(v),
+          stroke: c, "stroke-dasharray": "5 4", "stroke-width": "1.2",
+        }));
+        svg.appendChild(el("text", { x: W - pad.r + 6, y: y(v) + 4, fill: c, "font-size": "11" }, lab));
+      });
+      poly(PATH_BOT_SALON, css("--used"), true, "2.4");
+      poly(PATH_BOT_STABLE, css("--accent"), false, "2");
+      poly(PATH_BOT_5, css("--neutral"), false, "2");
+      MES.forEach((m, i) => {
+        svg.appendChild(el("text", {
+          x: xs[i], y: H - 10, "text-anchor": "middle", fill: css("--muted"), "font-size": "11",
+        }, m));
+      });
+    }
+
     function drawAll() {
       drawFlow();
       drawPie();
@@ -494,6 +598,8 @@
       drawLine();
       horizBars(document.getElementById("barsMedian"), SHANS.map((s) => ({ name: s.name.replace(/\n/g, " "), median: s.median })), 6, "median");
       horizBars(document.getElementById("barsCar"), CARS, 7, "mln");
+      drawBotFlow();
+      drawBotLine();
     }
 
     function showTab(id) {

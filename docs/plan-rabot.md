@@ -2,7 +2,7 @@
 
 Начало: **1 сентября 2026**. Финиш: **1 сентября 2028**.
 
-Связанные файлы: разбор `docs/analiz-xiaomi-su7-24m.md`, ветки покупки `docs/vetka-pokupki.md`, обзор в браузере `docs/obzor.html`, текст для модели `docs/prompt-xiaomi-su7-invest.md`, расчёт `scripts/monte_carlo.py`, помощник `src/sportscar_finance/`.
+Связанные файлы: разбор `docs/analiz-xiaomi-su7-24m.md`, ветки покупки `docs/vetka-pokupki.md`, обзор в браузере `docs/obzor.html`, бот на срочном рынке `docs/fuchersy-bot.md`, текст для модели `docs/prompt-xiaomi-su7-invest.md`, расчёт `scripts/monte_carlo.py`, помощник `src/sportscar_finance/`.
 
 Главное правило: бот в Telegram **смотрит новости и предупреждает**. Он сам ничего не покупает. Покупка на бирже — только руками, и только после 90 дней проверки «на бумаге».
 
