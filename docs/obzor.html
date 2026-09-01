@@ -1,0 +1,531 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Копилка на Xiaomi SU7 — обзор</title>
+  <style>
+    :root {
+      --bg: #f4f4f2;
+      --fg: #1a1a18;
+      --muted: #5c5c56;
+      --line: #d4d4ce;
+      --card: #ffffff;
+      --accent: #2563eb;
+      --ok: #15803d;
+      --warn: #b45309;
+      --bad: #b91c1c;
+      --salon: #3b6ea5;
+      --used: #2a9d6a;
+      --neutral: #7a7a74;
+    }
+    [data-theme="dark"] {
+      --bg: #161614;
+      --fg: #ecece8;
+      --muted: #a3a39a;
+      --line: #2e2e2a;
+      --card: #1e1e1b;
+      --accent: #6ea8ff;
+      --ok: #4ade80;
+      --warn: #fbbf24;
+      --bad: #f87171;
+      --salon: #7eb0e0;
+      --used: #5ee0a0;
+      --neutral: #9a9a92;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font: 16px/1.45 system-ui, Segoe UI, sans-serif;
+      background: var(--bg);
+      color: var(--fg);
+    }
+    .wrap { max-width: 1080px; margin: 0 auto; padding: 28px 20px 64px; }
+    h1 { font-size: 24px; font-weight: 650; margin: 0 0 8px; }
+    h2 { font-size: 18px; font-weight: 650; margin: 28px 0 8px; }
+    h3 { font-size: 15px; font-weight: 650; margin: 0 0 10px; }
+    p { margin: 0 0 12px; }
+    .lead, .note { color: var(--muted); }
+    .note { font-size: 13px; margin-bottom: 16px; }
+    header { display: flex; justify-content: space-between; gap: 16px; align-items: flex-start; }
+    button.theme {
+      border: 1px solid var(--line);
+      background: var(--card);
+      color: var(--fg);
+      border-radius: 8px;
+      padding: 6px 10px;
+      cursor: pointer;
+      font: inherit;
+    }
+    nav.tabs { display: flex; flex-wrap: wrap; gap: 8px; margin: 18px 0 22px; }
+    nav.tabs button {
+      border: 1px solid var(--line);
+      background: transparent;
+      color: var(--fg);
+      border-radius: 999px;
+      padding: 6px 14px;
+      cursor: pointer;
+      font: inherit;
+    }
+    nav.tabs button[aria-selected="true"] {
+      background: var(--fg);
+      color: var(--bg);
+      border-color: var(--fg);
+    }
+    .panel { display: none; }
+    .panel.on { display: block; }
+    .callout {
+      border: 1px solid var(--line);
+      background: var(--card);
+      border-radius: 10px;
+      padding: 14px 16px;
+      margin: 0 0 20px;
+    }
+    .callout.warn { border-left: 3px solid var(--warn); }
+    .callout.info { border-left: 3px solid var(--accent); }
+    .callout.ok { border-left: 3px solid var(--ok); }
+    .callout b { display: block; margin-bottom: 4px; }
+    .stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin: 16px 0 8px; }
+    .stat {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      padding: 12px 14px;
+    }
+    .stat strong { display: block; font-size: 22px; font-weight: 650; }
+    .stat span { color: var(--muted); font-size: 13px; }
+    .ok-num { color: var(--ok); }
+    .warn-num { color: var(--warn); }
+    .bad-num { color: var(--bad); }
+    .two { display: grid; grid-template-columns: 1.05fr 1fr; gap: 24px; align-items: start; }
+    table { width: 100%; border-collapse: collapse; font-size: 14px; }
+    th, td { text-align: left; padding: 8px 10px; border-bottom: 1px solid var(--line); vertical-align: top; }
+    th { color: var(--muted); font-weight: 600; font-size: 12px; }
+    td.r, th.r { text-align: right; }
+    .dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 8px; background: var(--neutral); }
+    .dot.ok { background: var(--ok); }
+    .dot.warn { background: var(--warn); }
+    .dot.bad { background: var(--bad); }
+    svg.chart { width: 100%; height: auto; display: block; background: var(--card); border: 1px solid var(--line); border-radius: 10px; }
+    .legend { display: flex; flex-wrap: wrap; gap: 14px; font-size: 13px; color: var(--muted); margin: 8px 0 0; }
+    .legend i { display: inline-block; width: 10px; height: 10px; border-radius: 2px; margin-right: 6px; }
+    a { color: var(--accent); }
+    .todo { list-style: none; padding: 0; margin: 0; }
+    .todo li { padding: 8px 0; border-bottom: 1px solid var(--line); }
+    .todo .done { color: var(--muted); text-decoration: line-through; }
+    @media (max-width: 800px) {
+      .stats, .two { grid-template-columns: 1fr 1fr; }
+      header { flex-direction: column; }
+    }
+    @media (max-width: 520px) {
+      .stats, .two { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <div>
+        <h1>Копилка на Xiaomi SU7 за 24 месяца</h1>
+        <p class="lead">Обзор цифр на 1 сентября 2026. Файл лежит в git: <code>docs/obzor.html</code>. Открой в браузере двойным щелчком.</p>
+      </div>
+      <button class="theme" type="button" id="themeBtn">Тёмная тема</button>
+    </header>
+
+    <nav class="tabs" role="tablist">
+      <button type="button" role="tab" data-tab="karta" aria-selected="true">Карта</button>
+      <button type="button" role="tab" data-tab="dengi" aria-selected="false">Деньги</button>
+      <button type="button" role="tab" data-tab="mashina" aria-selected="false">Машина</button>
+      <button type="button" role="tab" data-tab="srok" aria-selected="false">Срок</button>
+      <button type="button" role="tab" data-tab="gde" aria-selected="false">Где лежит</button>
+    </nav>
+
+    <section id="karta" class="panel on" role="tabpanel">
+      <div class="callout warn">
+        <b>Машину покупает заработок, не проценты на 100 тысяч</b>
+        Без новых взносов 100 000 ₽ должны вырасти в 57 раз, чтобы хватило на салон. Один вклад через 2 года даёт около 128 тысяч. Главный путь — план Б: работа около 220 тысяч в месяц плюс спокойный рынок.
+      </div>
+      <h2>Один взгляд: от старта к машине</h2>
+      <p class="note">Схема плана Б. Зелёная рамка — дешёвый путь с российскими номерами.</p>
+      <svg class="chart" id="flow" viewBox="0 0 900 220" role="img" aria-label="От ста тысяч к двум ценам машины"></svg>
+      <div class="stats">
+        <div class="stat"><strong>100 тыс.</strong><span>Старт, 1 сентября 2026</span></div>
+        <div class="stat"><strong>39%</strong><span>Шанс салона, план Б</span></div>
+        <div class="stat"><strong class="ok-num">64%</strong><span>Шанс вторички, план Б</span></div>
+        <div class="stat"><strong>4,89 млн</strong><span>Типичная сумма плана Б через 2 года</span></div>
+      </div>
+      <div class="two">
+        <div>
+          <h3>Куда кладём 100 000 ₽ в день 1</h3>
+          <svg class="chart" id="pie" viewBox="0 0 420 240" role="img" aria-label="Разложение стартовых 100 тысяч"></svg>
+        </div>
+        <div>
+          <h3>Две цены, не одна</h3>
+          <table>
+            <thead><tr><th>Цель</th><th class="r">Нужно</th><th class="r">Класть в месяц</th></tr></thead>
+            <tbody>
+              <tr><td>Салон, новая базовая</td><td class="r">5,72 млн</td><td class="r">207 тыс.</td></tr>
+              <tr><td>С пробегом, паспорт РФ</td><td class="r">3,99 млн</td><td class="r">144 тыс.</td></tr>
+              <tr><td>Прямой Китай → Россия</td><td class="r">5,17 млн</td><td class="r">187 тыс.</td></tr>
+              <tr><td>Только вклад без работы</td><td class="r">5,72 млн</td><td class="r">не дотягивает</td></tr>
+            </tbody>
+          </table>
+          <p class="note">Китайские 2,83 млн — не российская цена. Ввоз поднимает стоимость примерно в 1,6–1,8 раза. Минский ценник 2,9 млн не даёт постоянных российских номеров. Подробности: <a href="analiz-xiaomi-su7-24m.md">разбор</a>, <a href="vetka-pokupki.md">ветки покупки</a>.</p>
+        </div>
+      </div>
+    </section>
+
+    <section id="dengi" class="panel" role="tabpanel">
+      <div class="callout info">
+        <b>Сравнивать надо шанс купить машину, не рекламу процентов</b>
+        Посчитали 25 000 случайных историй. Код: <code>scripts/monte_carlo.py</code>. Салон — 5,72 млн. Вторичка с российским паспортом — 3,99 млн.
+      </div>
+      <h2>Шанс сесть в машину за 24 месяца, %</h2>
+      <p class="note">Два столбика на один план: новый салон и машина с пробегом. Источник: <a href="monte_carlo_results.json">monte_carlo_results.json</a>.</p>
+      <svg class="chart" id="barsChance" viewBox="0 0 800 300"></svg>
+      <p class="legend"><i style="background:var(--salon)"></i>Шанс салона, % &nbsp; <i style="background:var(--used)"></i>Шанс вторички с российским паспортом, %</p>
+      <h2>Как копилка растёт, если всё идёт обычно, млн ₽</h2>
+      <p class="note">Картинка по правилам плана: разгон заработка как в расчёте, рост копилки около 12–14% в год без случайных прыжков. Это не один из 25 000 путей. Пунктир — сколько нужно на машину. Типичный итог случайных историй плана Б — 4,89 млн.</p>
+      <svg class="chart" id="lineWealth" viewBox="0 0 800 300"></svg>
+      <p class="legend"><i style="background:var(--used)"></i>План Б, чек около 220 тыс. &nbsp; <i style="background:var(--accent)"></i>План В, чек около 120 тыс. &nbsp; <i style="background:var(--neutral)"></i>Только вклад, без работы</p>
+      <h2>Типичная сумма через 2 года, млн ₽</h2>
+      <svg class="chart" id="barsMedian" viewBox="0 0 800 280"></svg>
+      <h2>Где легко ошибиться</h2>
+      <table>
+        <thead><tr><th>Путают</th><th>На самом деле</th></tr></thead>
+        <tbody>
+          <tr><td>Вклад 14% купит машину</td><td>Через 2 года около 128 тысяч. Нужно 5,72 млн на салон.</td></tr>
+          <tr><td>Сайт с огромными процентами</td><td>Реклама максимальная, типичный итог — ноль. Схема живёт недели.</td></tr>
+          <tr><td>Экзамен фирмы сдают 10%</td><td>Держать счёт 2 года удаётся примерно 0,5% стартов.</td></tr>
+          <tr><td>Заём ускоряет цель</td><td>При живой работе заём снижает шанс салона с 39% до 27%.</td></tr>
+          <tr><td>Минск 2,9 млн = цена в России</td><td>Часто нельзя поставить на учёт. Постановление № 152.</td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section id="mashina" class="panel" role="tabpanel">
+      <div class="callout warn">
+        <b>Дешёвый ценник не равен российским номерам</b>
+        На форумах схема «купить в Беларуси и ездить в России» есть. Для постоянной официальной езды гражданину России подходит вторичка с российским паспортом или прямой ввоз в российскую таможню. Беларусь без письменного подтверждения учёта не бронируем.
+      </div>
+      <div class="stats">
+        <div class="stat"><strong>2,83 млн</strong><span>Ценник в Китае, не цена РФ</span></div>
+        <div class="stat"><strong>5,72 млн</strong><span>Салон с запасом 10%</span></div>
+        <div class="stat"><strong class="ok-num">3,99 млн</strong><span>Вторичка, паспорт РФ</span></div>
+        <div class="stat"><strong>~1,7 млн</strong><span>Экономия вторички против салона</span></div>
+      </div>
+      <h2>Сколько нужно накопить, млн ₽</h2>
+      <p class="note">Запас 10% уже внутри. Текст: <a href="vetka-pokupki.md">vetka-pokupki.md</a>.</p>
+      <svg class="chart" id="barsCar" viewBox="0 0 800 260"></svg>
+      <table>
+        <thead><tr><th>Путь</th><th class="r">Нужно, млн ₽</th><th>Можно ли ездить в России по правилам</th></tr></thead>
+        <tbody>
+          <tr><td><span class="dot ok"></span>Салон</td><td class="r">5,72</td><td>да</td></tr>
+          <tr><td><span class="dot ok"></span>Китай → таможня РФ</td><td class="r">5,17</td><td>да, если российский паспорт</td></tr>
+          <tr><td><span class="dot warn"></span>Беларусь «под ключ в РФ»</td><td class="r">4,60</td><td>спорно</td></tr>
+          <tr><td><span class="dot ok"></span>С пробегом, паспорт РФ</td><td class="r">3,99</td><td>да</td></tr>
+          <tr><td><span class="dot bad"></span>Только ценник в Минске</td><td class="r">3,22</td><td>нет как постоянные номера РФ</td></tr>
+        </tbody>
+      </table>
+      <p>В Telegram: <code>/puti</code> — все ветки, <code>/hurdle</code> — пороги, сводка вечером пишет две суммы. Не бронировать салон, пока не сверены объявления с пробегом.</p>
+    </section>
+
+    <section id="srok" class="panel" role="tabpanel">
+      <h2>Контрольные даты до 1 сентября 2028</h2>
+      <p class="note">План: <a href="plan-rabot.md">plan-rabot.md</a>. Сегодня в календаре проекта — 1 сентября 2026.</p>
+      <table>
+        <thead><tr><th>Дата</th><th>Что должно быть правдой</th></tr></thead>
+        <tbody>
+          <tr><td>14.09.2026</td><td>Бот отвечает, таблица денег начата</td></tr>
+          <tr><td>11.09.2026</td><td>Сообщение про заседание Банка России</td></tr>
+          <tr><td>01.10.2026</td><td>Первый оплаченный счёт или честно: ниша не взлетела</td></tr>
+          <tr><td>01.12.2026</td><td>Чистыми не меньше 80 тысяч или смена предложения</td></tr>
+          <tr><td>01.03.2027</td><td>Капитал не меньше 1,0 млн; иначе аварийная ветка</td></tr>
+          <tr><td>01.09.2027</td><td>Не меньше 1,8 млн и живой заработок</td></tr>
+          <tr><td>01.03.2028</td><td>Финиш: салон / вторичка / прямой ввоз / кредит</td></tr>
+          <tr><td>01.09.2028</td><td>Решение о покупке по факту денег и актуальной цене</td></tr>
+        </tbody>
+      </table>
+      <h2>Что уже сделано в проекте и что руками</h2>
+      <ul class="todo">
+        <li class="done">Разбор, план, ветки покупки и расчёт 25 000 историй записаны</li>
+        <li class="done">Помощник в Telegram: курсы, стоп, команды /puti и /hurdle</li>
+        <li>Вписать токен бота и номер чата в .env, проверить /status</li>
+        <li>Оформить самозанятость, разложить 100 тысяч, завести таблицу денег</li>
+        <li>Каждое 1-е число: четыре цены машины и новый расчёт шанса</li>
+      </ul>
+      <h2>Правило стоп</h2>
+      <div class="stats" style="grid-template-columns:1fr 1fr">
+        <div class="stat"><strong class="warn-num">−15%</strong><span>Рыночные деньги просели — осторожно</span></div>
+        <div class="stat"><strong class="bad-num">−25%</strong><span>Просели сильнее — стоп риска, работу не останавливать</span></div>
+      </div>
+    </section>
+
+    <section id="gde" class="panel" role="tabpanel">
+      <div class="callout ok">
+        <b>Этот HTML — версия для git и браузера</b>
+        Канвас в Cursor — тот же смысл рядом с чатом, в репозиторий обычно не попадает. Здесь файл можно коммитить, открывать без Cursor и слать человеку как ссылку на файл.
+      </div>
+      <h2>Что кладём в git</h2>
+      <table>
+        <thead><tr><th>Путь в репозитории</th><th>Что это</th></tr></thead>
+        <tbody>
+          <tr><td><code>docs/obzor.html</code></td><td>Эта карта с вкладками, открывается в браузере</td></tr>
+          <tr><td><code>docs/analiz-xiaomi-su7-24m.md</code></td><td>Полный разбор, источник формулировок</td></tr>
+          <tr><td><code>docs/vetka-pokupki.md</code></td><td>Как купить дешевле салона и ездить в России</td></tr>
+          <tr><td><code>docs/plan-rabot.md</code></td><td>План дел по неделям</td></tr>
+          <tr><td><code>docs/prompt-xiaomi-su7-invest.md</code></td><td>Задание для умной модели</td></tr>
+          <tr><td><code>docs/monte_carlo_results.json</code></td><td>Сырые цифры 25 000 историй</td></tr>
+          <tr><td><code>scripts/monte_carlo.py</code></td><td>Код расчёта</td></tr>
+          <tr><td><code>src/sportscar_finance/</code></td><td>Помощник в Telegram</td></tr>
+          <tr><td><code>.cursor/rules/prostoy-russkiy.mdc</code></td><td>Правило: писать простым русским</td></tr>
+        </tbody>
+      </table>
+      <h2>Что в git не кладём</h2>
+      <table>
+        <thead><tr><th>Где</th><th>Почему</th></tr></thead>
+        <tbody>
+          <tr><td><code>.env</code></td><td>Секретный токен бота</td></tr>
+          <tr><td><code>data/state.json</code></td><td>Память бота: курсы и кнопка стоп</td></tr>
+          <tr><td>Канвасы Cursor (<code>canvases/*.canvas.tsx</code>)</td><td>Живут у Cursor рядом с чатом, не в папке репозитория</td></tr>
+          <tr><td>Таблица денег Google / <code>data/ledger.csv</code></td><td>Живые взносы, заводишь сам с недели 1</td></tr>
+        </tbody>
+      </table>
+      <h2>Как открыть этот файл</h2>
+      <p>В проводнике: <code>c:\Users\admin\PycharmProjects\sportscar-finance\docs\obzor.html</code> — двойной щелчок. Или из папки проекта: правой кнопкой по файлу → открыть в браузере. Интернет не нужен: картинки рисуются самим файлом, без внешних библиотек.</p>
+    </section>
+  </div>
+  <script>
+    const css = (name) => getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+
+    function skillPmt(t, level) {
+      if (t < 2) return 0;
+      return level * Math.min(1, (t - 1) / 6);
+    }
+    function wealthEvery3Months(level, yearRate) {
+      const r = Math.pow(1 + yearRate, 1 / 12) - 1;
+      let w = 100000;
+      const out = [0.1];
+      for (let t = 0; t < 24; t++) {
+        w = (w + skillPmt(t, level)) * (1 + r);
+        if ((t + 1) % 3 === 0) out.push(Math.round((w / 1e6) * 100) / 100);
+      }
+      return out;
+    }
+
+    const SHANS = [
+      { name: "План Б\n220 тыс.", salon: 39.4, used: 63.9, median: 4.89 },
+      { name: "План Д\nвклад", salon: 38.4, used: 64.2, median: 4.87 },
+      { name: "План А\nзаём", salon: 26.8, used: 41.0, median: 3.22 },
+      { name: "План В\n120 тыс.", salon: 10.4, used: 25.5, median: 2.70 },
+      { name: "План Ж\nсайт %", salon: 4.7, used: 12.7, median: 1.61 },
+      { name: "Только\nвклад", salon: 0, used: 0, median: 0.13 },
+    ];
+    const CARS = [
+      { name: "Салон", mln: 5.72 },
+      { name: "Китай → РФ", mln: 5.17 },
+      { name: "Беларусь «в РФ»", mln: 4.6 },
+      { name: "С пробегом", mln: 3.99 },
+      { name: "Ценник Минск", mln: 3.22 },
+    ];
+    const MES = ["старт", "3", "6", "9", "12", "15", "18", "21", "24 мес"];
+    const PLAN_B = wealthEvery3Months(208000, 0.14);
+    const PLAN_V = wealthEvery3Months(113000, 0.12);
+    const VKLAD = wealthEvery3Months(0, 0.125);
+
+    function el(tag, attrs, text) {
+      const n = document.createElementNS("http://www.w3.org/2000/svg", tag);
+      Object.entries(attrs).forEach(([k, v]) => n.setAttribute(k, v));
+      if (text != null) n.textContent = text;
+      return n;
+    }
+
+    function box(svg, x, y, w, h, label, accent) {
+      svg.appendChild(el("rect", {
+        x, y, width: w, height: h, rx: 8,
+        fill: css("--card"),
+        stroke: accent ? css("--used") : css("--line"),
+        "stroke-width": accent ? 2.5 : 1,
+      }));
+      svg.appendChild(el("text", {
+        x: x + w / 2, y: y + h / 2 + 4,
+        "text-anchor": "middle", fill: css("--fg"), "font-size": "13",
+      }, label));
+    }
+    function line(svg, x1, y1, x2, y2) {
+      svg.appendChild(el("line", { x1, y1, x2, y2, stroke: css("--muted"), "stroke-width": "1.5" }));
+    }
+
+    function drawFlow() {
+      const svg = document.getElementById("flow");
+      svg.replaceChildren();
+      box(svg, 16, 88, 130, 44, "Старт 100 тыс.");
+      box(svg, 210, 16, 150, 40, "Работа, 40 тыс.");
+      box(svg, 210, 90, 150, 40, "Вклад, 50 тыс.");
+      box(svg, 210, 164, 150, 40, "Биткоин, 10 тыс.");
+      box(svg, 430, 88, 150, 44, "Копилка, 24 мес.");
+      box(svg, 650, 40, 230, 44, "Вторичка 3,99 млн", true);
+      box(svg, 650, 136, 230, 44, "Салон 5,72 млн");
+      line(svg, 146, 110, 210, 36);
+      line(svg, 146, 110, 210, 110);
+      line(svg, 146, 110, 210, 184);
+      line(svg, 360, 36, 430, 110);
+      line(svg, 360, 110, 430, 110);
+      line(svg, 360, 184, 430, 110);
+      line(svg, 580, 110, 650, 62);
+      line(svg, 580, 110, 650, 158);
+    }
+
+    function drawPie() {
+      const svg = document.getElementById("pie");
+      svg.replaceChildren();
+      const parts = [
+        { label: "Работа 40 тыс.", v: 40, c: css("--accent") },
+        { label: "Вклад 50 тыс.", v: 50, c: css("--used") },
+        { label: "Биткоин 10 тыс.", v: 10, c: css("--warn") },
+      ];
+      let a0 = -Math.PI / 2;
+      const cx = 120, cy = 120, r = 78, ri = 42;
+      parts.forEach((p) => {
+        const a1 = a0 + (p.v / 100) * Math.PI * 2;
+        const large = p.v > 50 ? 1 : 0;
+        const x0 = cx + r * Math.cos(a0), y0 = cy + r * Math.sin(a0);
+        const x1 = cx + r * Math.cos(a1), y1 = cy + r * Math.sin(a1);
+        const xi0 = cx + ri * Math.cos(a0), yi0 = cy + ri * Math.sin(a0);
+        const xi1 = cx + ri * Math.cos(a1), yi1 = cy + ri * Math.sin(a1);
+        const d = `M ${x0} ${y0} A ${r} ${r} 0 ${large} 1 ${x1} ${y1} L ${xi1} ${yi1} A ${ri} ${ri} 0 ${large} 0 ${xi0} ${yi0} Z`;
+        svg.appendChild(el("path", { d, fill: p.c }));
+        a0 = a1;
+      });
+      svg.appendChild(el("text", { x: cx, y: cy + 4, "text-anchor": "middle", fill: css("--fg"), "font-size": "13" }, "100 тыс."));
+      parts.forEach((p, i) => {
+        svg.appendChild(el("rect", { x: 240, y: 70 + i * 28, width: 12, height: 12, fill: p.c, rx: 2 }));
+        svg.appendChild(el("text", { x: 260, y: 81 + i * 28, fill: css("--fg"), "font-size": "13" }, p.label));
+      });
+    }
+
+    function groupedBars(svg, seriesA, seriesB, names, yMax, suffix) {
+      svg.replaceChildren();
+      const W = 800, H = 300, pad = { l: 44, r: 16, t: 16, b: 56 };
+      const iw = W - pad.l - pad.r, ih = H - pad.t - pad.b;
+      const n = names.length, gw = iw / n;
+      svg.appendChild(el("line", { x1: pad.l, y1: pad.t, x2: pad.l, y2: pad.t + ih, stroke: css("--line") }));
+      svg.appendChild(el("line", { x1: pad.l, y1: pad.t + ih, x2: W - pad.r, y2: pad.t + ih, stroke: css("--line") }));
+      for (let t = 0; t <= 4; t++) {
+        const val = (yMax * t) / 4;
+        const y = pad.t + ih - (val / yMax) * ih;
+        svg.appendChild(el("text", { x: pad.l - 8, y: y + 4, "text-anchor": "end", fill: css("--muted"), "font-size": "11" }, String(val) + (suffix || "")));
+      }
+      names.forEach((name, i) => {
+        const x0 = pad.l + i * gw + gw * 0.18;
+        const bw = gw * 0.28;
+        const hA = (seriesA[i] / yMax) * ih;
+        const hB = (seriesB[i] / yMax) * ih;
+        svg.appendChild(el("rect", { x: x0, y: pad.t + ih - hA, width: bw, height: hA, fill: css("--salon") }));
+        svg.appendChild(el("rect", { x: x0 + bw + 6, y: pad.t + ih - hB, width: bw, height: hB, fill: css("--used") }));
+        name.split("\n").forEach((line, li) => {
+          svg.appendChild(el("text", {
+            x: pad.l + i * gw + gw / 2, y: H - 34 + li * 12,
+            "text-anchor": "middle", fill: css("--muted"), "font-size": "11",
+          }, line));
+        });
+      });
+    }
+
+    function horizBars(svg, items, yMax, key) {
+      svg.replaceChildren();
+      const W = 800, H = Number(svg.getAttribute("viewBox").split(" ")[3]);
+      const pad = { l: 150, r: 56, t: 12, b: 20 };
+      const ih = H - pad.t - pad.b;
+      const n = items.length, row = ih / n;
+      items.forEach((it, i) => {
+        const y = pad.t + i * row + 10;
+        const w = ((it[key] / yMax) * (W - pad.l - pad.r));
+        svg.appendChild(el("text", { x: pad.l - 10, y: y + 14, "text-anchor": "end", fill: css("--fg"), "font-size": "12" }, it.name));
+        svg.appendChild(el("rect", { x: pad.l, y: y, width: Math.max(w, 2), height: 22, fill: css("--salon"), rx: 3 }));
+        svg.appendChild(el("text", { x: pad.l + w + 8, y: y + 16, fill: css("--fg"), "font-size": "12" }, String(it[key]).replace(".", ",")));
+      });
+    }
+
+    function drawLine() {
+      const svg = document.getElementById("lineWealth");
+      svg.replaceChildren();
+      const W = 800, H = 300, pad = { l: 48, r: 90, t: 20, b: 36 };
+      const iw = W - pad.l - pad.r, ih = H - pad.t - pad.b;
+      const yMax = 7;
+      const xs = MES.map((_, i) => pad.l + (i / (MES.length - 1)) * iw);
+      const y = (v) => pad.t + ih - (v / yMax) * ih;
+      function poly(data, color, fill) {
+        const pts = data.map((v, i) => `${xs[i]},${y(v)}`).join(" ");
+        if (fill) {
+          const area = `${xs[0]},${y(0)} ${pts} ${xs[xs.length - 1]},${y(0)}`;
+          svg.appendChild(el("polygon", { points: area, fill: color, opacity: "0.12" }));
+        }
+        svg.appendChild(el("polyline", { points: pts, fill: "none", stroke: color, "stroke-width": "2.2" }));
+      }
+      [[3.99, css("--used"), "вторичка 3,99"], [5.72, css("--warn"), "салон 5,72"]].forEach(([v, c, lab]) => {
+        svg.appendChild(el("line", {
+          x1: pad.l, y1: y(v), x2: W - pad.r, y2: y(v),
+          stroke: c, "stroke-dasharray": "5 4", "stroke-width": "1.2",
+        }));
+        svg.appendChild(el("text", { x: W - pad.r + 6, y: y(v) + 4, fill: c, "font-size": "11" }, lab));
+      });
+      poly(PLAN_B, css("--used"), true);
+      poly(PLAN_V, css("--accent"), false);
+      poly(VKLAD, css("--neutral"), false);
+      MES.forEach((m, i) => {
+        svg.appendChild(el("text", {
+          x: xs[i], y: H - 10, "text-anchor": "middle", fill: css("--muted"), "font-size": "11",
+        }, m));
+      });
+    }
+
+    function drawAll() {
+      drawFlow();
+      drawPie();
+      groupedBars(
+        document.getElementById("barsChance"),
+        SHANS.map((s) => s.salon),
+        SHANS.map((s) => s.used),
+        SHANS.map((s) => s.name),
+        70,
+        "",
+      );
+      drawLine();
+      horizBars(document.getElementById("barsMedian"), SHANS.map((s) => ({ name: s.name.replace(/\n/g, " "), median: s.median })), 6, "median");
+      horizBars(document.getElementById("barsCar"), CARS, 7, "mln");
+    }
+
+    function showTab(id) {
+      document.querySelectorAll(".panel").forEach((p) => p.classList.toggle("on", p.id === id));
+      document.querySelectorAll("nav.tabs button").forEach((b) => {
+        b.setAttribute("aria-selected", b.dataset.tab === id ? "true" : "false");
+      });
+      history.replaceState(null, "", "#" + id);
+    }
+
+    document.querySelectorAll("nav.tabs button").forEach((b) => {
+      b.addEventListener("click", () => showTab(b.dataset.tab));
+    });
+
+    const themeBtn = document.getElementById("themeBtn");
+    function applyTheme(mode) {
+      document.documentElement.setAttribute("data-theme", mode);
+      themeBtn.textContent = mode === "dark" ? "Светлая тема" : "Тёмная тема";
+      localStorage.setItem("su7-theme", mode);
+      drawAll();
+    }
+    themeBtn.addEventListener("click", () => {
+      const next = document.documentElement.getAttribute("data-theme") === "dark" ? "light" : "dark";
+      applyTheme(next);
+    });
+
+    const saved = localStorage.getItem("su7-theme");
+    const startTheme = saved || (matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
+    applyTheme(startTheme);
+
+    const hash = (location.hash || "#karta").slice(1);
+    if (document.getElementById(hash)) showTab(hash);
+  </script>
+</body>
+</html>
