@@ -5,6 +5,7 @@ from datetime import datetime, timezone
 from typing import Any
 
 from sportscar_finance.config import Settings
+from sportscar_finance.purchase import cheaper_hurdle
 
 
 @dataclass
@@ -31,6 +32,7 @@ def evaluate(
     *,
     usd_rub: float | None = None,
     cny_rub: float | None = None,
+    byn_rub: float | None = None,
     btc_usd: float | None = None,
     btc_change_24h: float | None = None,
     market_rub: float | None = None,
@@ -60,6 +62,20 @@ def evaluate(
                 f"Юань к рублю {cny_move:+.2%}",
                 f"Цена машины из Китая едет вместе с юанем. "
                 f"Было {state['last_cny_rub']:.4f}, стало {cny_rub:.4f}.",
+            )
+        )
+
+    byn_move = _move(state.get("last_byn_rub"), byn_rub)
+    if byn_move is not None and abs(byn_move) >= settings.usd_rub_day_move:
+        signals.append(
+            Signal(
+                "FX_BYN",
+                "warn",
+                f"Белорусский рубль к российскому {byn_move:+.2%}",
+                f"Было {state['last_byn_rub']:.4f}, стало {byn_rub:.4f}. "
+                "От этого курса пляшет ценник SU7 в Минске. "
+                "Дешёвая цена в Беларуси всё равно не значит, что машину поставят на учёт в России. "
+                "Смотри /puti.",
             )
         )
 
@@ -117,6 +133,8 @@ def evaluate(
         state["last_usd_rub"] = usd_rub
     if cny_rub is not None:
         state["last_cny_rub"] = cny_rub
+    if byn_rub is not None:
+        state["last_byn_rub"] = byn_rub
     if btc_usd is not None:
         state["last_btc_usd"] = btc_usd
         state["btc_hour_ref"] = [now, btc_usd]
@@ -127,18 +145,24 @@ def evaluate(
 def format_status(settings: Settings, state: dict[str, Any]) -> str:
     """Короткая сводка: сколько денег, сколько ещё нужно, включён ли стоп."""
     capital = settings.cash_rub + settings.btc_sleeve_rub + settings.skill_reserve_rub
-    hurdle = state.get("hurdle_t1") or settings.hurdle_t1
-    gap = max(hurdle - capital, 0)
+    salon = state.get("hurdle_t1") or settings.hurdle_t1
+    used_name, used_sum = cheaper_hurdle(settings)
+    used_sum = state.get("hurdle_used") or used_sum
+    gap_salon = max(salon - capital, 0)
+    gap_used = max(used_sum - capital, 0)
     killed = "включён" if state.get("killed") else "выключен"
     return (
         f"План «работа плюс спокойный рынок»\n"
         f"Деньги на старте (как записали): {capital:,.0f} ₽\n"
-        f"Нужно на базовую машину: {hurdle:,.0f} ₽\n"
-        f"Ещё не хватает: {gap:,.0f} ₽\n"
+        f"Нужно на салон (новая базовая): {salon:,.0f} ₽, не хватает {gap_salon:,.0f} ₽\n"
+        f"Нужно на дешёвый легальный путь ({used_name}): {used_sum:,.0f} ₽, "
+        f"не хватает {gap_used:,.0f} ₽\n"
         f"Доллар к рублю: {state.get('last_usd_rub')}\n"
         f"Юань к рублю: {state.get('last_cny_rub')}\n"
+        f"Белорусский рубль: {state.get('last_byn_rub')}\n"
         f"Биткоин, $: {state.get('last_btc_usd')}\n"
         f"Стоп риска: {killed}\n"
         f"Обновлено: {state.get('updated_at') or 'проверки ещё не было'}\n"
-        f"Напоминание: машину покупает заработок, а не игра на заёмные деньги."
+        f"Другие пути покупки — команда /puti. "
+        f"Машину покупает заработок, а не игра на заёмные деньги."
     ).replace(",", " ")

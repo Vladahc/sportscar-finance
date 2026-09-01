@@ -33,6 +33,11 @@ class Settings(BaseSettings):
     hurdle_t1: float = 5_720_000
     hurdle_t2: float = 7_150_000
     hurdle_t3: float = 12_100_000
+    # Дешевле салона, но с российской регистрацией (цифры на 1 сентября 2026).
+    hurdle_used: float = 3_990_000  # вторичка от 3,63 млн плюс запас 10%
+    hurdle_direct_cn: float = 5_170_000  # Китай + российская таможня, грубая оценка
+    hurdle_belarus_rf: float = 4_604_000  # объявления «таможня Беларусь, под ключ в РФ»
+    hurdle_belarus_local: float = 3_215_000  # ценник в Минске ~103 800 белорусских рублей
 
 
 def load_settings() -> Settings:

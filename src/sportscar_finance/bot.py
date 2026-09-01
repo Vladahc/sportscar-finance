@@ -12,6 +12,7 @@ from aiogram.types import Message
 
 from sportscar_finance.config import Settings, load_settings
 from sportscar_finance.feeds import fetch_btc, fetch_cbr_fx
+from sportscar_finance.purchase import cheaper_hurdle, format_paths
 from sportscar_finance.signals import Signal, evaluate, format_status
 from sportscar_finance.store import load as load_state
 from sportscar_finance.store import save as save_state
@@ -50,14 +51,16 @@ def _render(sig: Signal) -> str:
 
 
 async def run_macro_cycle(bot: Bot, settings: Settings) -> None:
-    """Раз в час: курсы доллара и юаня."""
+    """Раз в час: курсы доллара, юаня и белорусского рубля."""
     state = load_state()
     async with aiohttp.ClientSession() as session:
         fx = await fetch_cbr_fx(session)
-    signals = evaluate(settings, state, usd_rub=fx.usd_rub, cny_rub=fx.cny_rub)
+    signals = evaluate(
+        settings, state, usd_rub=fx.usd_rub, cny_rub=fx.cny_rub, byn_rub=fx.byn_rub
+    )
     save_state(state)
     for sig in signals:
-        if sig.kind in {"FX_USD", "FX_CNY"} and not _cooldown_ok(state, sig.kind):
+        if sig.kind in {"FX_USD", "FX_CNY", "FX_BYN"} and not _cooldown_ok(state, sig.kind):
             continue
         _mark_alert(state, sig.kind)
         save_state(state)
@@ -97,9 +100,19 @@ async def run_crypto_cycle(bot: Bot, settings: Settings) -> None:
 
 
 async def run_digest(bot: Bot, settings: Settings) -> None:
-    """Вечерняя сводка: сколько денег и что с курсами."""
+    """Вечерняя сводка: сколько денег, курсы и две цены машины."""
     state = load_state()
-    text = "Сводка на вечер (21:00 по Москве)\n\n" + format_status(settings, state)
+    cheap_name, cheap_sum = cheaper_hurdle(settings)
+    cheap_sum = state.get("hurdle_used") or cheap_sum
+    text = (
+        "Сводка на вечер (21:00 по Москве)\n\n"
+        + format_status(settings, state)
+        + "\n\nДве цели покупки: салон и дешёвый легальный путь "
+        f"({cheap_name}, {cheap_sum:,.0f} ₽). "
+        "Белорусский ценник без российских номеров в цель не входит. "
+        "Подробности — /puti. Смотри новости: сбор за ввоз, квота Беларуси, "
+        "постановление 152, кнопка экстренного вызова."
+    ).replace(",", " ")
     await _send(bot, settings.telegram_chat_id, text)
 
 
@@ -121,7 +134,8 @@ def build_dispatcher(bot: Bot, settings: Settings) -> Dispatcher:
             "/kill — стоп: больше не наращивать риск на рынке\n"
             "/resume — снова разрешить рыночный риск\n"
             "/capital — как разложить стартовые 100 000 ₽\n"
-            "/hurdle — сколько нужно на каждую комплектацию машины\n"
+            "/hurdle — сколько нужно на салон и на дешёвые легальные пути\n"
+            "/puti — салон, вторичка, прямой Китай, Беларусь: цены и риски\n"
             "Бот сам сделки не открывает. Он только предупреждает."
         )
 
@@ -181,12 +195,25 @@ def build_dispatcher(bot: Bot, settings: Settings) -> Dispatcher:
         if not _allowed(message):
             return
         await message.answer(
-            f"Базовая комплектация: {settings.hurdle_t1:,.0f} ₽\n"
-            f"Средняя и мощная: {settings.hurdle_t2:,.0f} ₽\n"
-            f"Самая мощная: {settings.hurdle_t3:,.0f} ₽\n"
-            "Это цена плюс запас 10% на налоги и оформление. "
-            "Цифры от 1 сентября 2026. Смотри актуальную цену машины каждый день."
+            (
+                f"Салон, новая базовая: {settings.hurdle_t1:,.0f} ₽\n"
+                f"Средняя и мощная: {settings.hurdle_t2:,.0f} ₽\n"
+                f"Самая мощная: {settings.hurdle_t3:,.0f} ₽\n"
+                f"С пробегом, российский паспорт: {settings.hurdle_used:,.0f} ₽\n"
+                f"Прямой ввоз Китай → Россия: {settings.hurdle_direct_cn:,.0f} ₽\n"
+                f"Беларусь «под ключ в Россию» по объявлениям: {settings.hurdle_belarus_rf:,.0f} ₽\n"
+                f"Только ценник в Минске (без российских номеров): {settings.hurdle_belarus_local:,.0f} ₽\n"
+                "Это цена плюс запас 10%. Цифры от 1 сентября 2026. "
+                "Минский ценник не цель проекта, пока юрист не подтвердил учёт в ГИБДД. "
+                "Подробности — /puti."
+            ).replace(",", " ")
         )
+
+    @dp.message(Command("puti"))
+    async def puti_cmd(message: Message) -> None:
+        if not _allowed(message):
+            return
+        await message.answer(format_paths(settings))
 
     return dp
 

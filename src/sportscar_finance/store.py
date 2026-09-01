@@ -22,7 +22,10 @@ def _default() -> dict[str, Any]:
         "peak_market_rub": None,
         "market_rub": None,
         "hurdle_t1": 5_720_000,
-        "updated_at": None,
+        "hurdle_used": 3_990_000,
+        "hurdle_direct_cn": 5_170_000,
+        "hurdle_belarus_rf": 4_604_000,
+        "last_byn_rub": None,
     }
 
 

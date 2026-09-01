@@ -5,6 +5,7 @@
 Что внутри:
 
 - разбор, куда класть деньги: `docs/analiz-xiaomi-su7-24m.md`
+- как купить машину дешевле салона и ездить в России: `docs/vetka-pokupki.md`
 - план дел по неделям: `docs/plan-rabot.md`
 - текст для умной модели: `docs/prompt-xiaomi-su7-invest.md`
 - расчёт множества случайных историй: `python scripts/monte_carlo.py`

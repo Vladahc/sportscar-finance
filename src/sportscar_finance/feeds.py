@@ -12,16 +12,19 @@ COINGECKO_BTC = (
     "?ids=bitcoin&vs_currencies=usd&include_24hr_change=true"
 )
 CBR_KEYRATE = "https://www.cbr.ru/hd_base/keyrate/"
+# Страницы, которые бот должен открывать при проверке цены машины.
 AUTO_USED = "https://auto.ru/cars/xiaomi/su7/23801820/used/"
+BELARUS_SU7 = "https://evauto.pro/catalog/xiaomi-su7"
 CBR_PRESS = "https://www.cbr.ru/rss/RssPress/"
 
 
 @dataclass
 class MacroSnapshot:
-    """Курс доллара и юаня к рублю на сейчас."""
+    """Курсы доллара, юаня и белорусского рубля к российскому рублю."""
 
     usd_rub: float | None
     cny_rub: float | None
+    byn_rub: float | None
     source: str
 
 
@@ -52,13 +55,14 @@ def _xml_value(xml: str, char_code: str) -> float | None:
 
 
 async def fetch_cbr_fx(session: aiohttp.ClientSession) -> MacroSnapshot:
-    """Скачивает курсы доллара и юаня с сайта Банка России."""
+    """Скачивает курсы доллара, юаня и белорусского рубля с сайта Банка России."""
     async with session.get(CBR_XML, timeout=aiohttp.ClientTimeout(total=20)) as resp:
         resp.raise_for_status()
         xml = await resp.text()
     return MacroSnapshot(
         usd_rub=_xml_value(xml, "USD"),
         cny_rub=_xml_value(xml, "CNY"),
+        byn_rub=_xml_value(xml, "BYN"),
         source="cbr_xml_daily",
     )
 

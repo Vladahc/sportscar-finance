@@ -20,7 +20,13 @@ W0 = 100_000.0
 # Сколько рублей нужно через 24 месяца, чтобы хватило на машину.
 # В сумму уже заложено 10% сверху на налоги и оформление.
 # Базовая / средняя / самая мощная комплектация — см. разбор в docs.
-HURDLE = {"T1": 5_720_000.0, "T2": 7_150_000.0, "T3": 12_100_000.0}
+# used — машина с пробегом и российским электронным паспортом.
+HURDLE = {
+    "T1": 5_720_000.0,
+    "T2": 7_150_000.0,
+    "T3": 12_100_000.0,
+    "used": 3_990_000.0,
+}
 
 
 @dataclass
@@ -36,6 +42,7 @@ class Result:
     p_t1: float
     p_t2: float
     p_t3: float
+    p_used: float
     dd_typ: float
     dd_tail: float
 
@@ -52,6 +59,7 @@ class Result:
             "p_t1": round(self.p_t1, 4),
             "p_t2": round(self.p_t2, 4),
             "p_t3": round(self.p_t3, 4),
+            "p_used": round(self.p_used, 4),
             "dd_typ": round(self.dd_typ, 3),
             "dd_tail": round(self.dd_tail, 3),
         }
@@ -72,6 +80,7 @@ def summarize(name: str, wealth: np.ndarray, start: float, pmt: float, dd: np.nd
         p_t1=float(np.mean(wealth >= HURDLE["T1"])),
         p_t2=float(np.mean(wealth >= HURDLE["T2"])),
         p_t3=float(np.mean(wealth >= HURDLE["T3"])),
+        p_used=float(np.mean(wealth >= HURDLE["used"])),
         dd_typ=float(np.median(dd)),
         dd_tail=float(np.percentile(dd, 90)),
     )
@@ -360,10 +369,10 @@ def main() -> None:
     out.write_text(json.dumps(payload, ensure_ascii=False, indent=2), encoding="utf-8")
 
     print(f"Записано {out}")
-    print(f"{'место':<4} {'шанс':>7} {'середина':>12} {'плохо':>12} {'хорошо':>14} {'ноль':>7}  название")
+    print(f"{'место':<4} {'салон':>7} {'пробег':>7} {'середина':>12} {'плохо':>12} {'хорошо':>14} {'ноль':>7}  название")
     for i, r in enumerate(rows, 1):
         print(
-            f"{i:<4} {r.p_t1:7.2%} {r.median:12,.0f} {r.p10:12,.0f} {r.p90:14,.0f} {r.p_ruin:7.2%}  {r.name}"
+            f"{i:<4} {r.p_t1:7.2%} {r.p_used:7.2%} {r.median:12,.0f} {r.p10:12,.0f} {r.p90:14,.0f} {r.p_ruin:7.2%}  {r.name}"
         )
 
 
