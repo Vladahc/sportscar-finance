@@ -1,9 +1,12 @@
+# Секреты и мусор, который в git не кладём.
+
 .env
 .venv/
 venv/
 __pycache__/
 *.pyc
 .pytest_cache/
+# Память бота: последние курсы и включён ли стоп.
 data/state.json
 data/*.db
 .idea/

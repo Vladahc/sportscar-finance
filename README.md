@@ -1,18 +1,26 @@
-# sportscar-finance
+# Копилка на Xiaomi SU7
 
-Контур на 24 месяца: накопить на Xiaomi SU7 в РФ со 100 000 ₽.
+Проект помогает за два года накопить на машину Xiaomi SU7 в России. На старте есть 100 000 рублей.
 
-- Анализ и ранжирование каналов: `docs/analiz-xiaomi-su7-24m.md`
-- План работ: `docs/plan-rabot.md`
-- Промпт модели: `docs/prompt-xiaomi-su7-invest.md`
-- Монте-Карло: `python scripts/monte_carlo.py`
-- Telegram-агент сигналов (не автоторговля):
+Что внутри:
+
+- разбор, куда класть деньги: `docs/analiz-xiaomi-su7-24m.md`
+- план дел по неделям: `docs/plan-rabot.md`
+- текст для умной модели: `docs/prompt-xiaomi-su7-invest.md`
+- расчёт множества случайных историй: `python scripts/monte_carlo.py`
+- помощник в Telegram (сам сделки не открывает, только предупреждает)
+
+Как запустить помощника:
 
 ```
 python -m pip install -e .
 copy .env.example .env
-# заполнить TELEGRAM_BOT_TOKEN и TELEGRAM_CHAT_ID
+```
+
+В файл `.env` впиши токен бота и номер своего чата. Потом:
+
+```
 python -m sportscar_finance
 ```
 
-Запускать из корня репозитория, чтобы подхватились `.env` и `data/state.json`.
+Запускай из папки проекта, чтобы нашлись `.env` и файл памяти `data/state.json`.

@@ -4,7 +4,9 @@ from dataclasses import dataclass
 
 import aiohttp
 
+# Официальные курсы Банка России на сегодня.
 CBR_XML = "https://www.cbr.ru/scripts/XML_daily.asp"
+# Цена биткоина в долларах и изменение за сутки.
 COINGECKO_BTC = (
     "https://api.coingecko.com/api/v3/simple/price"
     "?ids=bitcoin&vs_currencies=usd&include_24hr_change=true"
@@ -16,6 +18,8 @@ CBR_PRESS = "https://www.cbr.ru/rss/RssPress/"
 
 @dataclass
 class MacroSnapshot:
+    """Курс доллара и юаня к рублю на сейчас."""
+
     usd_rub: float | None
     cny_rub: float | None
     source: str
@@ -23,12 +27,15 @@ class MacroSnapshot:
 
 @dataclass
 class CryptoSnapshot:
+    """Цена биткоина и насколько она изменилась за сутки."""
+
     btc_usd: float | None
     change_24h: float | None
     source: str
 
 
 def _xml_value(xml: str, char_code: str) -> float | None:
+    """Достаёт число курса из xml-ответа Банка России."""
     marker = f"<CharCode>{char_code}</CharCode>"
     i = xml.find(marker)
     if i < 0:
@@ -45,6 +52,7 @@ def _xml_value(xml: str, char_code: str) -> float | None:
 
 
 async def fetch_cbr_fx(session: aiohttp.ClientSession) -> MacroSnapshot:
+    """Скачивает курсы доллара и юаня с сайта Банка России."""
     async with session.get(CBR_XML, timeout=aiohttp.ClientTimeout(total=20)) as resp:
         resp.raise_for_status()
         xml = await resp.text()
@@ -56,6 +64,7 @@ async def fetch_cbr_fx(session: aiohttp.ClientSession) -> MacroSnapshot:
 
 
 async def fetch_btc(session: aiohttp.ClientSession) -> CryptoSnapshot:
+    """Скачивает цену биткоина."""
     async with session.get(COINGECKO_BTC, timeout=aiohttp.ClientTimeout(total=20)) as resp:
         resp.raise_for_status()
         payload = await resp.json()
@@ -68,6 +77,7 @@ async def fetch_btc(session: aiohttp.ClientSession) -> CryptoSnapshot:
 
 
 async def fetch_text(session: aiohttp.ClientSession, url: str) -> str:
+    """Скачивает текст страницы. Пригодится для новостей и цены машины."""
     async with session.get(url, timeout=aiohttp.ClientTimeout(total=25)) as resp:
         resp.raise_for_status()
         return await resp.text()

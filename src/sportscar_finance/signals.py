@@ -9,13 +9,17 @@ from sportscar_finance.config import Settings
 
 @dataclass
 class Signal:
+    """Одно сообщение человеку: что случилось и насколько это серьёзно."""
+
     kind: str
-    severity: str  # info | warn | kill
+    # info — просто знать; warn — осторожно; kill — стоп, больше не рисковать
+    severity: str
     title: str
     body: str
 
 
 def _move(prev: float | None, cur: float | None) -> float | None:
+    """На сколько цена изменилась по сравнению с прошлым разом (доля, не рубли)."""
     if prev is None or cur is None or prev == 0:
         return None
     return (cur - prev) / prev
@@ -31,6 +35,7 @@ def evaluate(
     btc_change_24h: float | None = None,
     market_rub: float | None = None,
 ) -> list[Signal]:
+    """Смотрит новые курсы и решает, о чём предупредить."""
     signals: list[Signal] = []
     now = datetime.now(timezone.utc).isoformat()
 
@@ -40,8 +45,9 @@ def evaluate(
             Signal(
                 "FX_USD",
                 "warn",
-                f"USD/RUB {usd_move:+.2%}",
-                f"Было {state['last_usd_rub']:.4f}, стало {usd_rub:.4f}. Пересмотреть MM vs валютный кэш.",
+                f"Доллар к рублю {usd_move:+.2%}",
+                f"Было {state['last_usd_rub']:.4f}, стало {usd_rub:.4f}. "
+                "Подумай, оставлять ли деньги в рублях или часть в валюте.",
             )
         )
 
@@ -51,8 +57,9 @@ def evaluate(
             Signal(
                 "FX_CNY",
                 "warn",
-                f"CNY/RUB {cny_move:+.2%}",
-                f"Барьер SU7 двигается с юанем. Было {state['last_cny_rub']:.4f}, стало {cny_rub:.4f}.",
+                f"Юань к рублю {cny_move:+.2%}",
+                f"Цена машины из Китая едет вместе с юанем. "
+                f"Было {state['last_cny_rub']:.4f}, стало {cny_rub:.4f}.",
             )
         )
 
@@ -61,8 +68,9 @@ def evaluate(
             Signal(
                 "BTC_DAY",
                 "warn",
-                f"BTC за сутки {btc_change_24h:+.2%}",
-                "Не усреднять плечом. Сверить правило DD по крипто-рукаву.",
+                f"Биткоин за сутки {btc_change_24h:+.2%}",
+                "Не докупать на заёмные деньги. Проверь, не просели ли слишком сильно "
+                "деньги, которые лежат в биткоине.",
             )
         )
 
@@ -73,22 +81,24 @@ def evaluate(
             Signal(
                 "BTC_HOUR",
                 "warn",
-                f"BTC за час {hour_move:+.2%}",
-                f"{hour_ref[1]} → {btc_usd}. Часовой контур: не увеличивать плечо.",
+                f"Биткоин за час {hour_move:+.2%}",
+                f"{hour_ref[1]} → {btc_usd}. Сейчас не увеличивать риск.",
             )
         )
 
     if market_rub is not None:
         peak = state.get("peak_market_rub") or market_rub
         peak = max(peak, market_rub)
+        # Насколько текущая сумма ниже самой высокой точки.
         dd = 1.0 - market_rub / peak if peak else 0.0
         if dd >= settings.market_dd_kill:
             signals.append(
                 Signal(
                     "DD_KILL",
                     "kill",
-                    f"DD рыночного рукава {dd:.0%}",
-                    "Сигнал KILL_MARKET_SLEEVE: перевести риск в денежный рынок. Навык не останавливать.",
+                    f"Рыночные деньги просели на {dd:.0%}",
+                    "Стоп: переложи рискованные деньги в спокойный вклад. "
+                    "Работу и заработок не останавливай.",
                 )
             )
         elif dd >= settings.market_dd_warn:
@@ -96,8 +106,8 @@ def evaluate(
                 Signal(
                     "DD_WARN",
                     "warn",
-                    f"DD рыночного рукава {dd:.0%}",
-                    "Порог предупреждения. Не добавлять риск до восстановления.",
+                    f"Рыночные деньги просели на {dd:.0%}",
+                    "Это предупреждение. Пока не добавляй риск.",
                 )
             )
         state["peak_market_rub"] = peak
@@ -115,19 +125,20 @@ def evaluate(
 
 
 def format_status(settings: Settings, state: dict[str, Any]) -> str:
+    """Короткая сводка: сколько денег, сколько ещё нужно, включён ли стоп."""
     capital = settings.cash_rub + settings.btc_sleeve_rub + settings.skill_reserve_rub
     hurdle = state.get("hurdle_t1") or settings.hurdle_t1
     gap = max(hurdle - capital, 0)
-    killed = "ВКЛ" if state.get("killed") else "выкл"
+    killed = "включён" if state.get("killed") else "выключен"
     return (
-        f"Контур SU7 / T-B\n"
-        f"Капитал (журнал старта): {capital:,.0f} ₽\n"
-        f"Барьер T1: {hurdle:,.0f} ₽\n"
-        f"Гэп: {gap:,.0f} ₽\n"
-        f"USD/RUB: {state.get('last_usd_rub')}\n"
-        f"CNY/RUB: {state.get('last_cny_rub')}\n"
-        f"BTC: {state.get('last_btc_usd')}\n"
-        f"Kill-switch: {killed}\n"
-        f"Обновлено: {state.get('updated_at') or 'ещё не было цикла'}\n"
-        f"Напоминание: P(T1) двигает чек навыка, не плечо."
+        f"План «работа плюс спокойный рынок»\n"
+        f"Деньги на старте (как записали): {capital:,.0f} ₽\n"
+        f"Нужно на базовую машину: {hurdle:,.0f} ₽\n"
+        f"Ещё не хватает: {gap:,.0f} ₽\n"
+        f"Доллар к рублю: {state.get('last_usd_rub')}\n"
+        f"Юань к рублю: {state.get('last_cny_rub')}\n"
+        f"Биткоин, $: {state.get('last_btc_usd')}\n"
+        f"Стоп риска: {killed}\n"
+        f"Обновлено: {state.get('updated_at') or 'проверки ещё не было'}\n"
+        f"Напоминание: машину покупает заработок, а не игра на заёмные деньги."
     ).replace(",", " ")

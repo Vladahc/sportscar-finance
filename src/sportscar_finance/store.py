@@ -5,10 +5,12 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
+# Здесь бот помнит последние курсы и включён ли «стоп».
 STATE_PATH = Path("data/state.json")
 
 
 def _default() -> dict[str, Any]:
+    """Пустая память на самый первый запуск."""
     return {
         "killed": False,
         "kill_reason": "",
@@ -25,6 +27,7 @@ def _default() -> dict[str, Any]:
 
 
 def load() -> dict[str, Any]:
+    """Читает память с диска. Если файла ещё нет — возвращает пустую."""
     if not STATE_PATH.exists():
         return _default()
     data = json.loads(STATE_PATH.read_text(encoding="utf-8"))
@@ -34,6 +37,7 @@ def load() -> dict[str, Any]:
 
 
 def save(state: dict[str, Any]) -> None:
+    """Сохраняет память на диск и ставит время обновления."""
     STATE_PATH.parent.mkdir(parents=True, exist_ok=True)
     state["updated_at"] = datetime.now(timezone.utc).isoformat()
     STATE_PATH.write_text(json.dumps(state, ensure_ascii=False, indent=2), encoding="utf-8")
