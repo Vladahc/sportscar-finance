@@ -334,7 +334,9 @@ def build_help(wb: Workbook) -> None:
         "",
         "Это учебный расчёт при ровной прибыли, которую ты сам ставишь. Это не прогноз бота и не совет купить бумагу.",
         "",
-        "Связанные файлы проекта: docs/analiz-xiaomi-su7-24m.md, docs/fuchersy-bot.md, docs/obzor.html.",
+        "Отдельная тема роботов Китая — лист «Роботы Китай» и текст docs/roboty-kitaya-akcii.md. Это спутник внутри куска акций, не замена вклада.",
+        "",
+        "Связанные файлы проекта: docs/analiz-xiaomi-su7-24m.md, docs/fuchersy-bot.md, docs/obzor.html, docs/roboty-kitaya-akcii.md.",
     ]
     for i, line in enumerate(lines, 2):
         label(ws, f"A{i}", line, SMALL if not line else BODY)
@@ -684,12 +686,283 @@ def build_examples(wb: Workbook) -> None:
     ws.print_options.horizontalCentered = True
 
 
+def build_robots(wb: Workbook) -> None:
+    ws = wb.create_sheet("Роботы Китай")
+    ws.sheet_view.showGridLines = False
+    label(ws, "A1", "Спутник «роботы Китая»: не вместо копилки на машину", TITLE)
+    ws.merge_cells("A1:G1")
+    label(
+        ws,
+        "A2",
+        "Срез 1 сентября 2026. Жёлтая ячейка — какая доля куска «акции» уходит в тему. "
+        "Текст: docs/roboty-kitaya-akcii.md. Это не приказ брокеру.",
+        SMALL,
+    )
+    ws.merge_cells("A2:G2")
+
+    label(ws, "A4", "Ручка спутника", H2)
+    label(ws, "A5", "Какую долю куска «акции» кладём в роботов")
+    inp(ws["C5"], 0.25, "pct")
+    label(ws, "D5", "По умолчанию четверть. 100% = весь кусок акций в тему. 0% = спутника нет.", SMALL)
+    label(ws, "A6", "Это сколько от всех новых взносов")
+    ws["C6"] = "=C5*Ввод!C14"
+    pct(ws["C6"])
+    label(ws, "D6", "Должно быть не больше 5–7%. Иначе копилка начинает жить темой, а не машиной.", SMALL)
+    label(ws, "A7", "Первый месяц: всего в портфель рядом")
+    ws["C7"] = "=Месяцы!H3"
+    money(ws["C7"])
+    label(ws, "A8", "Из них в акции по листу «Ввод»")
+    ws["C8"] = "=C7*Ввод!C14"
+    money(ws["C8"])
+    label(ws, "A9", "Из них в спутник роботов")
+    ws["C9"] = "=C8*C5"
+    money(ws["C9"])
+    ws["C9"].fill = OK
+    label(ws, "A10", "Остаток акций — индекс Мосбиржи")
+    ws["C10"] = "=C8-C9"
+    money(ws["C10"])
+    label(ws, "A11", "Спутник за 24 месяца без роста рынка")
+    ws["C11"] = "=C9*24"
+    money(ws["C11"])
+    label(ws, "D11", "Даже если бумага вырастет втрое — это не салон и не вторичка.", SMALL)
+
+    dv = DataValidation(type="decimal", operator="between", formula1="0", formula2="1")
+    dv.error = "Поставь долю от 0% до 100%"
+    dv.add("C5")
+    ws.add_data_validation(dv)
+
+    label(ws, "A13", "Моё мнение одной строкой", H2)
+    label(
+        ws,
+        "A14",
+        "Тема верная: Китай уже продаёт тысячи гуманоидов. Для этой копилки — спутник, не двигатель. "
+        "После жара Юнитри покупать «первую акцию гуманоида» поздно. Если заходить — детали суставов и Xiaomi+UBTECH, "
+        "не ринг и не западную мелочь из секс-индустрии.",
+        BODY,
+    )
+    ws.merge_cells("A14:G14")
+    ws.row_dimensions[14].height = 48
+
+    label(ws, "A16", "Кого можно купить сегодня", H2)
+    eq_headers = [
+        "Приоритет",
+        "Кто",
+        "Тикер",
+        "Ориентир цены",
+        "Дата",
+        "Грубо в ₽",
+        "Зачем / почему не база",
+    ]
+    eq_rows = [
+        [
+            "1. Практично с Гонконга",
+            "Xiaomi — живой бизнес, машина, которую копишь",
+            "1810.HK",
+            "28,54 HK$",
+            "~29.08.2026",
+            "~316 ₽",
+            "Не чистый робот. CyberOne есть, но деньги делают телефоны и авто. Проще купить, чем Шанхай.",
+        ],
+        [
+            "1. Единственный чистый гуманоид",
+            "UBTECH — Walker на заводах, домашний U1",
+            "9880.HK",
+            "83,50 HK$",
+            "28.08.2026",
+            "~924 ₽",
+            "Выручка растёт, убыток ещё есть. 13 361 предзаказ U1, выдачи с 16.09.2026. Проверь, есть ли тикер у брокера.",
+        ],
+        [
+            "2. Лопаты, если доступен Шанхай",
+            "Саньхуа — приводы суставов плюс кондиционеры",
+            "002050.SZ",
+            "36,30 юаня",
+            "31.08.2026",
+            "~467 ₽",
+            "Прибыль живая. Зависит и от Tesla Optimus, и от обычных заказов. Ядро, не Юнитри.",
+        ],
+        [
+            "2. Тот же слой",
+            "Топу — сборки приводов под Optimus",
+            "601689.SH",
+            "46,66 юаня",
+            "31.08.2026",
+            "~600 ₽",
+            "Прыгает от новостей Теслы сильнее, чем от выставки в Пекине.",
+        ],
+        [
+            "3. Не база после IPO",
+            "Юнитри — тела G1/H2 и робопсы",
+            "688836.SH",
+            "603,08 юаня",
+            "24.08.2026",
+            "~7 750 ₽",
+            "Размещение 150,8; внутри дня 1 100; оценка ~244 млрд юаней при выручке 1,7 млрд. Одна акция уже дороже месячного куска акций.",
+        ],
+        [
+            "Не из копилки",
+            "Realbotix — RealDoll и сервисные гуманоиды",
+            "XBOTF / XBOT",
+            "0,2077 $",
+            "01.09.2026",
+            "~18 ₽",
+            "Выручка роботов 0,13 млн $ за квартал. Слияние с ONCO. Лотерея, не завод.",
+        ],
+    ]
+    for col, h in enumerate(eq_headers, 1):
+        cell = ws.cell(17, col, h)
+        cell.fill = HEAD
+        cell.font = WHITE
+        cell.border = THIN
+        cell.alignment = Alignment(wrap_text=True, vertical="center")
+    ws.row_dimensions[17].height = 32
+    for ri, row in enumerate(eq_rows, 18):
+        for ci, val in enumerate(row, 1):
+            cell = ws.cell(ri, ci, val)
+            cell.border = THIN
+            cell.font = BODY
+            cell.alignment = WRAP
+        ws.row_dimensions[ri].height = 56
+    ws["A18"].fill = OK
+    ws["A19"].fill = OK
+    ws["A20"].fill = OK
+
+    label(ws, "A25", "Кого нельзя купить (и всё равно надо знать)", H2)
+    priv_headers = ["Кто", "Почему важен", "Статус", "Что делать"]
+    priv_rows = [
+        [
+            "AgiBot",
+            "Первый по штукам: ~9 700 за полгода 2026, ~43% мира",
+            "Контроль Swancor 688585.SH; Гонконг обещают во 2-м полугодии 2026",
+            "Следить за заявкой, не покупать оболочку «на слухах»",
+        ],
+        [
+            "Galbot",
+            "Аптеки и магазины, ~1 100 штук, новый двуногий ET1",
+            "Частная, дорогая",
+            "В список ожидания листинга",
+        ],
+        [
+            "Deep Robotics",
+            "Собаки уже на электростанциях, гуманоид DR02 с выставки",
+            "Заявка на STAR",
+            "Спокойнее чистого шоу, если выйдут",
+        ],
+        [
+            "AheadForm",
+            "Эльф Сюань 2.0: лицо как у человека, дом-компаньон в планах",
+            "Частная, раунд на сотни млн юаней",
+            "Следить. Ног часто нет — это витрина мимики",
+        ],
+        [
+            "EXDOLL, DS Doll, Irontech",
+            "Китайский экспорт кукол и аниматронных голов для взрослых",
+            "Частные, тикера нет",
+            "Индустрию смотреть в новостях, долю купить нельзя",
+        ],
+        [
+            "AiMOGA (Chery)",
+            "Робот-регулировщик, 100 штук плюс договоры на 1 000",
+            "Под Chery 9973.HK, отдельного тикера нет",
+            "Это автозавод, роботы — третий этаж",
+        ],
+    ]
+    for col, h in enumerate(priv_headers, 1):
+        cell = ws.cell(26, col, h)
+        cell.fill = HEAD
+        cell.font = WHITE
+        cell.border = THIN
+        cell.alignment = Alignment(wrap_text=True)
+    for ri, row in enumerate(priv_rows, 27):
+        for ci, val in enumerate(row, 1):
+            cell = ws.cell(ri, ci, val)
+            cell.border = THIN
+            cell.font = BODY
+            cell.alignment = WRAP
+        ws.row_dimensions[ri].height = 40
+
+    label(ws, "A34", "Как собрать спутник, когда наберётся лот", H2)
+    basket_headers = ["Доля спутника", "Что", "Тикер", "Зачем"]
+    basket_rows = [
+        ["50%", "Xiaomi", "1810.HK", "Живой бизнес и цель копилки в одном имени"],
+        ["30%", "UBTECH", "9880.HK", "Завод + домашний компаньон U1"],
+        ["20%", "Кэш в юанях или гонконгских долларах", "—", "Тема горячая: выгоднее докупить после удара"],
+    ]
+    for col, h in enumerate(basket_headers, 1):
+        cell = ws.cell(35, col, h)
+        cell.fill = HEAD
+        cell.font = WHITE
+        cell.border = THIN
+    for ri, row in enumerate(basket_rows, 36):
+        for ci, val in enumerate(row, 1):
+            cell = ws.cell(ri, ci, val)
+            cell.border = THIN
+            cell.font = BODY
+            cell.alignment = WRAP
+        ws.row_dimensions[ri].height = 28
+    ws["A36"].fill = OK
+    ws["A37"].fill = OK
+
+    label(
+        ws,
+        "A40",
+        "Если доступен Шанхай, вместо кэша можно ядро Саньхуа 002050. "
+        "Юнитри в эту корзину не кладём, пока цена не перестанет жить жаром первого дня. "
+        "На СПБ Бирже проверь стакан: 1810 часто есть, 9880 и 688836 могут отсутствовать. "
+        "Курс среза: юань 12,8580 ₽, доллар 86,3793 ₽, гонконгский доллар ≈ 11,07 ₽.",
+        BODY,
+    )
+    ws.merge_cells("A40:G41")
+    ws.row_dimensions[40].height = 48
+
+    label(ws, "A43", "Календарь слежки", H2)
+    cal = [
+        ["Когда", "Что смотреть"],
+        ["Каждое 1-е число", "Цены 9880, 688836, 002050, 1810 и юань. Спутник −25% — не докупать из денег на машину"],
+        ["16.09.2026 и до конца года", "Выдачи UBTECH U1: штуки, срыв срока, возвраты"],
+        ["Осень 2026", "Живая ли заявка AgiBot в Гонконг"],
+        ["Новости Tesla Optimus", "Саньхуа и Топу часто прыгают от этого, не от выставки"],
+        ["Конец 2026", "Слияние Realbotix / ONCO — только вне копилки"],
+    ]
+    for col, h in enumerate(cal[0], 1):
+        cell = ws.cell(44, col, h)
+        cell.fill = HEAD
+        cell.font = WHITE
+        cell.border = THIN
+    for ri, row in enumerate(cal[1:], 45):
+        for ci, val in enumerate(row, 1):
+            cell = ws.cell(ri, ci, val)
+            cell.border = THIN
+            cell.font = BODY
+            cell.alignment = WRAP
+        ws.row_dimensions[ri].height = 32
+
+    label(
+        ws,
+        "A52",
+        "Источники: Counterpoint (поставки H1 2026); отчёты UBTECH 2025 и H1 2026; TechNode / Reuters / 36Kr (Юнитри IPO); "
+        "котировки stockanalysis и Yahoo на конец августа — 1 сентября 2026; Банк России (юань, доллар). "
+        "Перед сделкой сверни цену в стакане.",
+        SMALL,
+    )
+    ws.merge_cells("A52:G53")
+    ws.row_dimensions[52].height = 40
+
+    col_widths(ws, {"A": 36, "B": 52, "C": 18, "D": 16, "E": 14, "F": 14, "G": 62})
+    ws.page_setup.orientation = "landscape"
+    ws.page_setup.fitToPage = True
+    ws.page_setup.fitToWidth = 1
+    ws.page_setup.fitToHeight = 1
+    ws.print_options.horizontalCentered = True
+
+
 def main() -> None:
     wb = Workbook()
     build_vvod(wb)
     build_months(wb)
     build_help(wb)
     build_examples(wb)
+    build_robots(wb)
     OUT.parent.mkdir(parents=True, exist_ok=True)
     wb.save(OUT)
     print(f"Записано {OUT}")

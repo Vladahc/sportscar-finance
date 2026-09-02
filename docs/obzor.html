@@ -138,6 +138,7 @@
       <button type="button" role="tab" data-tab="bot" aria-selected="false">Бот</button>
       <button type="button" role="tab" data-tab="mashina" aria-selected="false">Машина</button>
       <button type="button" role="tab" data-tab="srok" aria-selected="false">Срок</button>
+      <button type="button" role="tab" data-tab="roboty" aria-selected="false">Роботы</button>
       <button type="button" role="tab" data-tab="gde" aria-selected="false">Где лежит</button>
     </nav>
 
@@ -308,6 +309,78 @@
       </div>
     </section>
 
+    <section id="roboty" class="panel" role="tabpanel">
+      <div class="callout warn">
+        <b>Тема живая, машину она не покупает</b>
+        Китай уже продаёт тысячи человекоподобных роботов. После жара Юнитри на бирже это не спокойный вклад. В копилку — спутник до 5% новых взносов, не старт 100 тысяч. Полный разбор: <a href="roboty-kitaya-akcii.md">roboty-kitaya-akcii.md</a>, лист «Роботы Китай» в <code>docs/portfel-24m.xlsx</code>.
+      </div>
+      <div class="stats">
+        <div class="stat"><strong>&gt;22 тыс.</strong><span>Поставки гуманоидов в мире, 1-е полугодие 2026</span></div>
+        <div class="stat"><strong class="ok-num">86%</strong><span>Доля пяти китайских фирм</span></div>
+        <div class="stat"><strong class="warn-num">+630%</strong><span>Юнитри в первую минуту торгов, потом откат</span></div>
+        <div class="stat"><strong>5%</strong><span>Потолок спутника от новых взносов</span></div>
+      </div>
+      <h2>Кто продаёт штуки — и кого можно купить</h2>
+      <p class="note">Столбики — поставки за первое полугодие 2026, тысячи штук. Зелёный край — бумагу можно купить. Серый — частная или только обходной путь. Источник: Counterpoint.</p>
+      <svg class="chart" id="barsRobots" viewBox="0 0 800 260" role="img" aria-label="Поставки гуманоидов и доступность акции"></svg>
+      <p class="legend"><i style="background:var(--used)"></i>Есть акция, которую теоретически можно купить &nbsp; <i style="background:var(--neutral)"></i>Частная или только обходной путь</p>
+      <table>
+        <thead><tr><th>Кто</th><th class="r">Штук</th><th>Акция</th><th>Для копилки</th></tr></thead>
+        <tbody>
+          <tr><td><span class="dot bad"></span>AgiBot</td><td class="r">~9 700</td><td>нет (обход 688585, обещают Гонконг)</td><td>лидер по штукам, купить нельзя</td></tr>
+          <tr><td><span class="dot warn"></span>Юнитри</td><td class="r">&gt;7 000</td><td>688836.SH с 19.08.2026</td><td>после жара IPO не база</td></tr>
+          <tr><td><span class="dot bad"></span>Galbot</td><td class="r">~1 100</td><td>нет</td><td>аптеки и магазины, ждём листинг</td></tr>
+          <tr><td><span class="dot ok"></span>UBTECH</td><td class="r">~1 000</td><td>9880.HK</td><td>единственный чистый гуманоид с Гонконга</td></tr>
+          <tr><td><span class="dot bad"></span>Leju</td><td class="r">~650</td><td>нет</td><td>следим</td></tr>
+        </tbody>
+      </table>
+      <h2>Три слоя, не одна корзина</h2>
+      <div class="two">
+        <div>
+          <table>
+            <thead><tr><th>Слой</th><th>Примеры</th><th>Смысл</th></tr></thead>
+            <tbody>
+              <tr><td>Тела</td><td>Юнитри, UBTECH, AgiBot</td><td>Кто дешевле соберёт туловище</td></tr>
+              <tr><td>Мозг</td><td>DeepSeek в Юнитри, Nvidia, Tesla</td><td>Пока робот глуп без подсказки</td></tr>
+              <tr><td>Детали суставов</td><td>Саньхуа, Топу, Leaderdrive</td><td>Заказ придёт, даже если бренд сменится</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div>
+          <div class="callout ok">
+            <b>Если заходить — лопаты, не ринг</b>
+            Саньхуа (002050) уже зарабатывает на кондиционерах и авто. Юнитри после 144 выручек в цене — ставка «всё сбудется сразу». С гонконгского стакана проще: Xiaomi (ты копишь на их машину) плюс UBTECH.
+          </div>
+          <div class="callout info">
+            <b>Близость и секс-индустрия: следить, не кормить копилку</b>
+            Китайские заводы кукол — частные. AheadForm (эльф на выставке) без акции. Realbotix ~0,21 $, выручка роботов 0,13 млн $ за квартал. Биржевой компаньон — UBTECH U1, выдачи с 16 сентября 2026, 13 361 предзаказ. Это разговор и лицо, не продукт 18+.
+          </div>
+        </div>
+      </div>
+      <h2>Что делать руками в этой копилке</h2>
+      <table>
+        <thead><tr><th>Приоритет</th><th>Действие</th></tr></thead>
+        <tbody>
+          <tr><td>1</td><td>План Б не трогать. Спутник — четверть куска «акции», то есть 5% новых взносов (~1 050 ₽ в первый месяц при боте 5%).</td></tr>
+          <tr><td>2</td><td>Копить спутник до лота. На 4 200 ₽ Юнитри не купить: одна акция ~7 750 ₽, лот обычно 200 штук.</td></tr>
+          <tr><td>3</td><td>Если есть Гонконг: половина спутника Xiaomi 1810, треть UBTECH 9880, остальное кэш до просадки.</td></tr>
+          <tr><td>4</td><td>Если есть Шанхай: ядро Саньхуа 002050, не Юнитри.</td></tr>
+          <tr><td>Нельзя</td><td>100 тысяч старта в «роботов», CFD вместо акции, Realbotix из денег на машину.</td></tr>
+        </tbody>
+      </table>
+      <h2>Ближайшие даты слежки</h2>
+      <table>
+        <thead><tr><th>Дата</th><th>Что должно быть правдой</th></tr></thead>
+        <tbody>
+          <tr><td>Каждое 1-е</td><td>Записаны цены 9880, 688836, 002050, 1810 и курс юаня</td></tr>
+          <tr><td>16.09.2026</td><td>Пошли ли первые домашние UBTECH U1</td></tr>
+          <tr><td>Осень 2026</td><td>Есть ли живая заявка AgiBot в Гонконг</td></tr>
+          <tr><td>Конец 2026</td><td>Слияние Realbotix / ONCO — только вне копилки</td></tr>
+        </tbody>
+      </table>
+      <p class="note">Цифры выставки сверены с отчётами и новостями августа 2026. Это не индивидуальная рекомендация купить бумагу.</p>
+    </section>
+
     <section id="gde" class="panel" role="tabpanel">
       <div class="callout ok">
         <b>Этот HTML — версия для git и браузера</b>
@@ -318,7 +391,8 @@
         <thead><tr><th>Путь в репозитории</th><th>Что это</th></tr></thead>
         <tbody>
           <tr><td><code>docs/obzor.html</code></td><td>Эта карта с вкладками, открывается в браузере</td></tr>
-          <tr><td><code>docs/portfel-24m.xlsx</code></td><td>Таблица: работа 20 тыс./мес + бот, доли и 24 месяца. Лист «Примеры сегодня» — цены акций и золота</td></tr>
+          <tr><td><code>docs/portfel-24m.xlsx</code></td><td>Таблица: работа 20 тыс./мес + бот, доли и 24 месяца. Лист «Примеры сегодня» — цены акций и золота. Лист «Роботы Китай» — спутник темы</td></tr>
+          <tr><td><code>docs/roboty-kitaya-akcii.md</code></td><td>Разбор акций роботов Китая и компаньонов, срез 1 сентября 2026</td></tr>
           <tr><td><code>scripts/build_portfolio_xlsx.py</code></td><td>Сборка этой таблицы заново</td></tr>
           <tr><td><code>docs/fuchersy-bot.md</code></td><td>Расчёт: бот на срочном рынке и вывод 20% прибыли</td></tr>
           <tr><td><code>docs/futures_bot_results.json</code></td><td>Сырые цифры этого расчёта</td></tr>
@@ -379,6 +453,13 @@
       { name: "Беларусь «в РФ»", mln: 4.6 },
       { name: "С пробегом", mln: 3.99 },
       { name: "Ценник Минск", mln: 3.22 },
+    ];
+    const ROBOTS_SHIP = [
+      { name: "AgiBot", units: 9.7, listed: false },
+      { name: "Юнитри", units: 7.0, listed: true },
+      { name: "Galbot", units: 1.1, listed: false },
+      { name: "UBTECH", units: 1.0, listed: true },
+      { name: "Leju", units: 0.65, listed: false },
     ];
     const MES = ["старт", "3", "6", "9", "12", "15", "18", "21", "24 мес"];
     const PLAN_B = wealthEvery3Months(208000, 0.14);
@@ -586,6 +667,28 @@
       });
     }
 
+    function drawRobotBars() {
+      const svg = document.getElementById("barsRobots");
+      if (!svg) return;
+      svg.replaceChildren();
+      const W = 800, H = 260;
+      const pad = { l: 150, r: 90, t: 12, b: 20 };
+      const ih = H - pad.t - pad.b;
+      const yMax = 11;
+      const n = ROBOTS_SHIP.length, row = ih / n;
+      ROBOTS_SHIP.forEach((it, i) => {
+        const y = pad.t + i * row + 10;
+        const w = (it.units / yMax) * (W - pad.l - pad.r);
+        svg.appendChild(el("text", { x: pad.l - 10, y: y + 14, "text-anchor": "end", fill: css("--fg"), "font-size": "12" }, it.name));
+        svg.appendChild(el("rect", {
+          x: pad.l, y: y, width: Math.max(w, 2), height: 22,
+          fill: it.listed ? css("--used") : css("--neutral"), rx: 3,
+        }));
+        const lab = String(it.units).replace(".", ",") + (it.listed ? " · есть тикер" : " · нет тикера");
+        svg.appendChild(el("text", { x: pad.l + w + 8, y: y + 16, fill: css("--fg"), "font-size": "12" }, lab));
+      });
+    }
+
     function drawAll() {
       drawFlow();
       drawPie();
@@ -602,6 +705,7 @@
       horizBars(document.getElementById("barsCar"), CARS, 7, "mln");
       drawBotFlow();
       drawBotLine();
+      drawRobotBars();
     }
 
     function showTab(id) {
